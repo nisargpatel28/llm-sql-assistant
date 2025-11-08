@@ -1,4 +1,0 @@
-Download and Install anaconda: Along with Env Path 
-conda create -p venv python==3.10 -y
-conda activate venv/
-streamlit run app.py
