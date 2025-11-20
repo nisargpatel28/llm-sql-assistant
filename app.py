@@ -4,7 +4,7 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import re
-load_dotenv()  # Load all the env variables
+load_dotenv()  # Load all the env variables - updated with google api key
 
 
 # Configure the API key
