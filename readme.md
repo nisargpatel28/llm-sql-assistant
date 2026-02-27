@@ -1,4 +1,4 @@
-🤖 AI Chatbot for FinTech — Intelligent Transaction Query Assistant with Agentic Support Routing
+🤖 AI Chatbot for FinTech: Intelligent Transaction Query Assistant with Agentic Support Routing
 
 This repository accompanies a tutorial on building an AI-powered chatbot that integrates RAG (Retrieval-Augmented Generation), LangChain, and **Agentic AI** to interact with financial data securely and intelligently.
 
@@ -194,6 +194,6 @@ The system implements enterprise-grade agentic patterns:
 
 If you’re exploring AI in FinTech, building intelligent assistants for banking or analytics, or just curious about applied LangChain + RAG, feel free to connect!
 
-🔗 LinkedIn
+🔗 LinkedIn: https://www.linkedin.com/in/nisargbpatel/
 
 💬 Telegram: @PatelNisarg28
