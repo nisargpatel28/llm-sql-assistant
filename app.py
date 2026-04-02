@@ -93,6 +93,10 @@ def introspect_schema(db, table='fintech'):
     conn.close()
     return [row[1] for row in rows]
 
+# SQL injection defense:
+# whitelist table/column names
+# regex check for ; DROP|UPDATE|DELETE|ALTER etc
+
 
 def enforce_safe_query(sql_query, allowed_tables, allowed_columns, row_limit=1000):
     normalized = sql_query.strip()
