@@ -19,4 +19,30 @@ class ExternalConversationTool:
         self.api_endpoint = api_endpoint or "https://api.example.com/conversation"
         self.session = requests.Session()
 
+    def add_message(self, user_id: str, message: str, metadata: Optional[Dict] = None) -> Dict:
+        """Add a message to external conversation service"""
+        try:
+            payload = {
+                "user_id": user_id,
+                "message": message,
+                "metadata": metadata or {},
+                "timestamp": datetime.now().isoformat()
+            }
 
+            response = self.session.post(
+                f"{self.api_endpoint}/add", json=payload, timeout=10)
+            response.raise_for_status()
+
+            return {
+                "success": True,
+                "data": response.json(),
+                "tool": "external_conversation"
+            }
+
+        except Exception as e:
+            logger.error(f"External conversation tool error: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "fallback": True
+            }
