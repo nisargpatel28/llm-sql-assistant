@@ -46,3 +46,25 @@ class ExternalConversationTool:
                 "error": str(e),
                 "fallback": True
             }
+
+    def get_context(self, user_id: str, limit: int = 10) -> Dict:
+        """Get conversation context from external service"""
+        try:
+            params = {"user_id": user_id, "limit": limit}
+            response = self.session.get(
+                f"{self.api_endpoint}/context", params=params, timeout=10)
+            response.raise_for_status()
+
+            return {
+                "success": True,
+                "context": response.json(),
+                "tool": "external_conversation"
+            }
+
+        except Exception as e:
+            logger.error(f"External conversation context error: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "context": []
+            }
