@@ -142,3 +142,10 @@ class ExternalAnomalyTool:
                 "error": str(e),
                 "anomalies": []
             }
+
+class ExternalReportTool:
+    """Tool for external report generation"""
+
+    def __init__(self, api_endpoint: Optional[str] = None):
+        self.api_endpoint = api_endpoint or "https://api.example.com/report"
+        self.session = requests.Session()
