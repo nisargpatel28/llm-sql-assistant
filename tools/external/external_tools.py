@@ -149,3 +149,33 @@ class ExternalReportTool:
     def __init__(self, api_endpoint: Optional[str] = None):
         self.api_endpoint = api_endpoint or "https://api.example.com/report"
         self.session = requests.Session()
+
+    def generate_report(self, report_type: str, data: List[Dict], filters: Dict) -> Dict:
+        """Generate report using external service"""
+        try:
+            payload = {
+                "report_type": report_type,
+                "data": data,
+                "filters": filters,
+                "timestamp": datetime.now().isoformat()
+            }
+
+            response = self.session.post(
+                f"{self.api_endpoint}/generate", json=payload, timeout=60)
+            response.raise_for_status()
+
+            result = response.json()
+
+            return {
+                "success": True,
+                "report": result,
+                "tool": "external_report"
+            }
+
+        except Exception as e:
+            logger.error(f"External report tool error: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "report": {}
+            }
