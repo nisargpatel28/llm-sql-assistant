@@ -179,3 +179,14 @@ class ExternalReportTool:
                 "error": str(e),
                 "report": {}
             }
+
+
+class ExternalToolsManager:
+    """Manager for all external tools"""
+
+    def __init__(self):
+        self.conversation_tool = ExternalConversationTool()
+        self.prediction_tool = ExternalPredictionTool()
+        self.anomaly_tool = ExternalAnomalyTool()
+        self.report_tool = ExternalReportTool()
+        self.executor = ThreadPoolExecutor(max_workers=4)
