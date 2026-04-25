@@ -230,3 +230,13 @@ class ExternalToolsManager:
                 "success": False,
                 "error": f"Unknown tool: {tool_name}"
             }
+
+    def get_available_tools(self) -> List[str]:
+        """Get list of available external tools"""
+        return [
+            "conversation_add",
+            "conversation_get",
+            "prediction_suggest",
+            "anomaly_detect",
+            "report_generate"
+        ]
