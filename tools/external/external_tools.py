@@ -240,3 +240,13 @@ class ExternalToolsManager:
             "anomaly_detect",
             "report_generate"
         ]
+
+    def get_tool_status(self) -> Dict[str, bool]:
+        """Check status of external tools"""
+        # In a real implementation, this would ping each service
+        return {
+            "conversation_tool": True,  # Assume available
+            "prediction_tool": True,
+            "anomaly_tool": True,
+            "report_tool": True
+        }
