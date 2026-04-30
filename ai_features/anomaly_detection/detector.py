@@ -83,3 +83,35 @@ class AnomalyDetector:
                 "stats": {},
                 "total_transactions": len(data)
             }
+
+    def _preprocess_data(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Preprocess transaction data for anomaly detection"""
+        processed = df.copy()
+
+        # Convert date to datetime if it's not already
+        if 'date' in processed.columns:
+            processed['date'] = pd.to_datetime(
+                processed['date'], errors='coerce')
+
+        # Convert amount to numeric
+        processed['amount'] = pd.to_numeric(
+            processed['amount'], errors='coerce')
+
+        # Fill missing values
+        processed['amount'] = processed['amount'].fillna(
+            processed['amount'].median())
+
+        # Add derived features
+        if 'date' in processed.columns:
+            processed['hour'] = processed['date'].dt.hour
+            processed['day_of_week'] = processed['date'].dt.dayofweek
+            processed['month'] = processed['date'].dt.month
+
+        # Add rolling statistics
+        processed = processed.sort_values('date')
+        processed['amount_rolling_mean'] = processed['amount'].rolling(
+            window=10, min_periods=1).mean()
+        processed['amount_rolling_std'] = processed['amount'].rolling(
+            window=10, min_periods=1).std()
+
+        return processed
