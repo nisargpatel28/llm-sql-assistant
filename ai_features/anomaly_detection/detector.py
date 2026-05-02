@@ -171,3 +171,51 @@ class AnomalyDetector:
             print(f"Error in statistical anomaly detection: {e}")
 
         return anomalies
+
+    def _detect_ml_anomalies(self, df: pd.DataFrame, threshold: float) -> List[Dict]:
+        """Detect anomalies using machine learning"""
+        anomalies = []
+
+        if len(df) < 10:  # Need minimum data for ML
+            return anomalies
+
+        try:
+            # Prepare features for ML
+            features = ['amount']
+            if 'hour' in df.columns:
+                features.append('hour')
+            if 'day_of_week' in df.columns:
+                features.append('day_of_week')
+
+            X = df[features].values
+
+            # Scale features
+            X_scaled = self.scaler.fit_transform(X)
+
+            # Fit isolation forest
+            self.isolation_forest.fit(X_scaled)
+
+            # Get anomaly scores
+            anomaly_scores = self.isolation_forest.decision_function(X_scaled)
+            predictions = self.isolation_forest.predict(X_scaled)
+
+            # Convert scores to confidence (isolation forest returns -1 for outliers, 1 for inliers)
+            # decision_function returns values from -1 to 1, where -1 is most anomalous
+            confidence_threshold = -threshold  # More negative = more anomalous
+
+            for idx, (score, prediction) in enumerate(zip(anomaly_scores, predictions)):
+                if score < confidence_threshold or prediction == -1:
+                    anomalies.append({
+                        "index": int(idx),
+                        "transaction_id": df.iloc[idx].get('transaction_id', f"tx_{idx}"),
+                        "amount": float(df.iloc[idx]['amount']),
+                        "date": str(df.iloc[idx].get('date', '')),
+                        "method": "isolation_forest",
+                        "score": float(score),
+                        "reason": f"ML anomaly score {score:.3f} below threshold {confidence_threshold:.3f}"
+                    })
+
+        except Exception as e:
+            print(f"Error in ML anomaly detection: {e}")
+
+        return anomalies
