@@ -219,3 +219,29 @@ class AnomalyDetector:
             print(f"Error in ML anomaly detection: {e}")
 
         return anomalies
+
+    def _combine_anomaly_results(self, statistical: List[Dict], ml: List[Dict], df: pd.DataFrame) -> List[Dict]:
+        """Combine and deduplicate anomaly results"""
+        all_anomalies = statistical + ml
+
+        # Remove duplicates based on transaction_id
+        seen_ids = set()
+        unique_anomalies = []
+
+        for anomaly in all_anomalies:
+            tx_id = anomaly.get('transaction_id')
+            if tx_id not in seen_ids:
+                seen_ids.add(tx_id)
+                unique_anomalies.append(anomaly)
+
+        # Sort by severity (lower score = more anomalous for ML, higher z-score for statistical)
+        def sort_key(anomaly):
+            if anomaly['method'] == 'isolation_forest':
+                return anomaly.get('score', 0)
+            else:
+                # More negative for more anomalous
+                return -abs(anomaly.get('score', 0))
+
+        unique_anomalies.sort(key=sort_key)
+
+        return unique_anomalies
