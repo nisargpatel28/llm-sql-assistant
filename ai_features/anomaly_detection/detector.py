@@ -245,3 +245,35 @@ class AnomalyDetector:
         unique_anomalies.sort(key=sort_key)
 
         return unique_anomalies
+
+    def _calculate_statistics(self, df: pd.DataFrame) -> Dict:
+        """Calculate basic statistics for the transaction data"""
+        stats = {}
+
+        try:
+            amounts = df['amount'].values
+
+            stats = {
+                "total_amount": float(amounts.sum()),
+                "average_amount": float(amounts.mean()),
+                "median_amount": float(np.median(amounts)),
+                "min_amount": float(amounts.min()),
+                "max_amount": float(amounts.max()),
+                "std_deviation": float(np.std(amounts)),
+                "transaction_count": len(amounts),
+                "date_range": {
+                    "start": str(df['date'].min()) if 'date' in df.columns else None,
+                    "end": str(df['date'].max()) if 'date' in df.columns else None
+                }
+            }
+
+            # Add status distribution if available
+            if 'status' in df.columns:
+                status_counts = df['status'].value_counts().to_dict()
+                stats["status_distribution"] = {
+                    k: int(v) for k, v in status_counts.items()}
+
+        except Exception as e:
+            print(f"Error calculating statistics: {e}")
+
+        return stats
