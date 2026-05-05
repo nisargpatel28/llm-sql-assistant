@@ -277,3 +277,15 @@ class AnomalyDetector:
             print(f"Error calculating statistics: {e}")
 
         return stats
+
+    def _get_z_threshold(self, confidence: float) -> float:
+        """Get Z-score threshold for given confidence level"""
+        # For 95% confidence, z = 1.96, for 99% z = 2.58
+        if confidence >= 0.99:
+            return 2.58
+        elif confidence >= 0.95:
+            return 1.96
+        elif confidence >= 0.90:
+            return 1.645
+        else:
+            return 1.0
