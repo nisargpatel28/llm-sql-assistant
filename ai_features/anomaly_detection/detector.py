@@ -289,3 +289,13 @@ class AnomalyDetector:
             return 1.645
         else:
             return 1.0
+
+    def _get_iqr_multiplier(self, confidence: float) -> float:
+        """Get IQR multiplier for given confidence level"""
+        # Standard IQR multiplier is 1.5, more conservative for higher confidence
+        if confidence >= 0.99:
+            return 3.0
+        elif confidence >= 0.95:
+            return 2.0
+        else:
+            return 1.5
