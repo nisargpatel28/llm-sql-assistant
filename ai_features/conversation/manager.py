@@ -17,3 +17,12 @@ class Message:
     content: str
     timestamp: datetime
     metadata: Optional[Dict] = None
+
+
+class ConversationManager:
+    """Manages conversation context and history for multi-turn interactions"""
+
+    def __init__(self, db_path: str = "conversation.db", max_context_length: int = 50):
+        self.db_path = db_path
+        self.max_context_length = max_context_length
+        self._init_database()
