@@ -26,3 +26,29 @@ class ConversationManager:
         self.db_path = db_path
         self.max_context_length = max_context_length
         self._init_database()
+
+    def _init_database(self):
+        """Initialize the conversation database"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS conversations (
+                user_id TEXT NOT NULL,
+                message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                metadata TEXT,
+                session_id TEXT
+            )
+        """)
+
+        # Create index for faster queries
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_user_timestamp
+            ON conversations(user_id, timestamp)
+        """)
+
+        conn.commit()
+        conn.close()
