@@ -52,3 +52,34 @@ class ConversationManager:
 
         conn.commit()
         conn.close()
+
+    def add_message(self, user_id: str, role: str, content: str,
+                    metadata: Optional[Dict] = None, session_id: Optional[str] = None):
+        """Add a message to the conversation history"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        message = Message(
+            role=role,
+            content=content,
+            timestamp=datetime.now(),
+            metadata=metadata or {}
+        )
+
+        cursor.execute("""
+            INSERT INTO conversations (user_id, role, content, timestamp, metadata, session_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            user_id,
+            message.role,
+            message.content,
+            message.timestamp.isoformat(),
+            json.dumps(message.metadata),
+            session_id
+        ))
+
+        # Clean up old messages to maintain context length
+        self._cleanup_old_messages(cursor, user_id)
+
+        conn.commit()
+        conn.close()
