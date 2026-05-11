@@ -83,3 +83,15 @@ class ConversationManager:
 
         conn.commit()
         conn.close()
+
+    def _cleanup_old_messages(self, cursor: sqlite3.Cursor, user_id: str):
+        """Remove old messages to keep context within limits"""
+        cursor.execute("""
+            DELETE FROM conversations
+            WHERE user_id = ? AND message_id NOT IN (
+                SELECT message_id FROM conversations
+                WHERE user_id = ?
+                ORDER BY timestamp DESC
+                LIMIT ?
+            )
+        """, (user_id, user_id, self.max_context_length))
