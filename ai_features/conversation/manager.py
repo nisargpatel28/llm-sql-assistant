@@ -95,3 +95,32 @@ class ConversationManager:
                 LIMIT ?
             )
         """, (user_id, user_id, self.max_context_length))
+
+    def get_context(self, user_id: str, limit: Optional[int] = None) -> List[Dict]:
+        """Get conversation context for a user"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        limit_clause = f"LIMIT {limit}" if limit else ""
+
+        cursor.execute(f"""
+            SELECT role, content, timestamp, metadata
+            FROM conversations
+            WHERE user_id = ?
+            ORDER BY timestamp DESC
+            {limit_clause}
+        """, (user_id,))
+
+        messages = []
+        for row in cursor.fetchall():
+            messages.append({
+                "role": row[0],
+                "content": row[1],
+                "timestamp": row[2],
+                "metadata": json.loads(row[3]) if row[3] else {}
+            })
+
+        conn.close()
+
+        # Return in chronological order (oldest first)
+        return list(reversed(messages))
