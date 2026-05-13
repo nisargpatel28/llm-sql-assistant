@@ -124,3 +124,29 @@ class ConversationManager:
 
         # Return in chronological order (oldest first)
         return list(reversed(messages))
+
+    def get_recent_context(self, user_id: str, hours: int = 24) -> List[Dict]:
+        """Get context from the last N hours"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cutoff_time = (datetime.now() - timedelta(hours=hours)).isoformat()
+
+        cursor.execute("""
+            SELECT role, content, timestamp, metadata
+            FROM conversations
+            WHERE user_id = ? AND timestamp >= ?
+            ORDER BY timestamp ASC
+        """, (user_id, cutoff_time))
+
+        messages = []
+        for row in cursor.fetchall():
+            messages.append({
+                "role": row[0],
+                "content": row[1],
+                "timestamp": row[2],
+                "metadata": json.loads(row[3]) if row[3] else {}
+            })
+
+        conn.close()
+        return messages
