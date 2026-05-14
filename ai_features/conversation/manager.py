@@ -150,3 +150,14 @@ class ConversationManager:
 
         conn.close()
         return messages
+
+    def clear_context(self, user_id: str):
+        """Clear all conversation context for a user"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "DELETE FROM conversations WHERE user_id = ?", (user_id,))
+
+        conn.commit()
+        conn.close()
