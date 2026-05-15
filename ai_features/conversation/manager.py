@@ -161,3 +161,26 @@ class ConversationManager:
 
         conn.commit()
         conn.close()
+
+    def get_conversation_stats(self, user_id: str) -> Dict:
+        """Get statistics about the user's conversation"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT COUNT(*), MIN(timestamp), MAX(timestamp)
+            FROM conversations
+            WHERE user_id = ?
+        """, (user_id,))
+
+        row = cursor.fetchone()
+        conn.close()
+
+        if row and row[0] > 0:
+            return {
+                "total_messages": row[0],
+                "first_message": row[1],
+                "last_message": row[2]
+            }
+        else:
+            return {"total_messages": 0, "first_message": None, "last_message": None}
