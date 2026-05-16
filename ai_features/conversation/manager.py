@@ -184,3 +184,27 @@ class ConversationManager:
             }
         else:
             return {"total_messages": 0, "first_message": None, "last_message": None}
+
+    def search_conversation(self, user_id: str, query: str) -> List[Dict]:
+        """Search conversation history for specific content"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT role, content, timestamp, metadata
+            FROM conversations
+            WHERE user_id = ? AND content LIKE ?
+            ORDER BY timestamp DESC
+        """, (user_id, f"%{query}%"))
+
+        messages = []
+        for row in cursor.fetchall():
+            messages.append({
+                "role": row[0],
+                "content": row[1],
+                "timestamp": row[2],
+                "metadata": json.loads(row[3]) if row[3] else {}
+            })
+
+        conn.close()
+        return messages
